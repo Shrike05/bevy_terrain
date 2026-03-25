@@ -10,7 +10,7 @@ pub fn spawn_terrain(
     let material = materials.add(Color::srgb(0.25, 0.25, 0.25));
     let hover_material = materials.add(Color::srgb(0.1, 0.1, 0.1));
 
-    for i in 0..(SIZE * SIZE) {
+    for i in 0..get_chunk_sq() {
         let pos = grid_to_world(&index_to_grid(i as u32));
 
         commands
@@ -40,10 +40,12 @@ pub fn update_tile<E: EntityEvent>(
 }
 
 pub fn tile_clicked<E: EntityEvent>()
--> impl Fn(On<E>, Query<&Transform>, MessageWriter<BuildMessage>) {
+-> impl Fn(On<E>, Query<&Transform>, MessageWriter<TileClickedMessage>) {
     move |event, mut query, mut msg| {
         if let Ok(transform) = query.get_mut(event.event_target()) {
-            msg.write(BuildMessage::new(world_to_grid(&transform.translation)));
+            msg.write(TileClickedMessage::new(world_to_grid(
+                &transform.translation,
+            )));
         }
     }
 }

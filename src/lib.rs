@@ -8,3 +8,5 @@ mod types;
 pub use globals::*;
 pub use plugin::*;
 pub use types::*;
+
+mod test;

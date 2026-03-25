@@ -1,10 +1,21 @@
 use bevy::prelude::*;
+use std::sync::OnceLock;
 
-pub const SIZE: usize = 4;
-pub const SIZE_SQUARED: usize = SIZE * SIZE;
+pub static CHUNK_SIZE: OnceLock<usize> = OnceLock::new();
 
 pub type GridPos = UVec2;
 pub type WorldPos = Vec3;
+
+#[inline]
+pub fn get_chunk_size() -> usize {
+    *CHUNK_SIZE.get().expect("Couldn't get CHUNK_SIZE")
+}
+
+#[inline]
+pub fn get_chunk_sq() -> usize {
+    let c = *CHUNK_SIZE.get().expect("Couldn't get CHUNK_SIZE");
+    c * c
+}
 
 pub fn world_to_grid(world_pos: &WorldPos) -> GridPos {
     GridPos::new(world_pos.x as u32, world_pos.z as u32)
@@ -15,7 +26,7 @@ pub fn grid_to_world(grid_pos: &GridPos) -> WorldPos {
 }
 
 pub fn index_to_grid<T: Into<u32>>(index: T) -> GridPos {
-    let s = SIZE as u32;
+    let s = *CHUNK_SIZE.get().expect("CHUNK_SIZE not initialized") as u32;
     let i = index.into();
     let x = i % s;
     let y = i / s;
